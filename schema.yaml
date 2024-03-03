@@ -1,10 +1,150 @@
 openapi: 3.0.3
 info:
-  title: OpenAPI schema for template walrus-template-template
+  title: OpenAPI schema for template terraform-google-redis
 components:
   schemas:
     variables:
       type: object
+      required:
+      - infrastructure
+      properties:
+        infrastructure:
+          title: Infrastructure
+          type: object
+          description: |
+            Specify the infrastructure information for deploying.
+          required:
+          - vpc_id
+          properties:
+            vpc_id:
+              description: The ID of the VPC where the Redis service applies. It is
+                a fully-qualified resource name, such as projects/{project_id}/global/networks/{network_id}.
+              title: Vpc Id
+              type: string
+              x-walrus-ui:
+                order: 1
+          x-walrus-ui:
+            colSpan: 12
+            group: Advanced
+            order: 2
+        architecture:
+          title: Architecture
+          type: string
+          description: |
+            Specify the deployment architecture, select from standalone or replication.
+          default: standalone
+          enum:
+          - standalone
+          - replication
+          x-walrus-ui:
+            group: Basic
+            order: 3
+        replication_readonly_replicas:
+          title: Replication Readonly Replicas
+          type: number
+          description: |
+            Specify the number of read-only replicas under the replication deployment.
+          default: 1
+          enum:
+          - 1
+          - 3
+          - 5
+          x-walrus-ui:
+            group: Basic
+            order: 4
+            showIf: architecture=replication
+        engine_version:
+          title: Engine Version
+          type: string
+          description: |
+            Specify the deployment engine version, select from 7.0, 6.0, 5.0, 4.0, 3.2.
+          default: "7.0"
+          enum:
+          - "7.0"
+          - "6.0"
+          - "5.0"
+          - "4.0"
+          - "3.2"
+          x-walrus-ui:
+            group: Basic
+            order: 5
+        engine_parameters:
+          title: Engine Parameters
+          type: array
+          description: |
+            Specify the deployment parameters, see https://cloud.google.com/memorystore/docs/redis/reference/rest/v1/projects.locations.instances#Instance.FIELDS.redis_configs
+          default: []
+          items:
+            properties:
+              name:
+                title: Name
+                type: string
+                x-walrus-ui:
+                  order: 1
+              value:
+                title: Value
+                type: string
+                x-walrus-ui:
+                  order: 2
+            required:
+            - name
+            - value
+            type: object
+            x-walrus-ui:
+              colSpan: 12
+          x-walrus-ui:
+            colSpan: 12
+            group: Basic
+            order: 6
+        resources:
+          title: Resources
+          type: object
+          description: |
+            Specify the computing resources.
+            Select from BASIC, STANDARD_HA.Choosing the computing resource is also related to the storage resource, please view the specification document for more information.
+
+            Examples:
+            ```
+            resources:
+              class: string, optional            # https://cloud.google.com/memorystore/docs/redis/reference/rest/v1/projects.locations.instances#Tier
+            ```
+          default:
+            class: STANDARD_HA
+          properties:
+            class:
+              default: STANDARD_HA
+              title: Class
+              type: string
+              x-walrus-ui:
+                order: 1
+          x-walrus-ui:
+            colSpan: 12
+            group: Basic
+            order: 7
+        storage:
+          title: Storage
+          type: object
+          description: |
+            Specify the Redis memory storage size in gigabytes.
+            Examples:
+            ```
+            storage:
+              size: number, optional         # in gigabytes
+            ```
+          default:
+            size: 5
+          properties:
+            size:
+              default: 5
+              title: Size
+              type: number
+              x-walrus-ui:
+                order: 1
+          x-walrus-ui:
+            colSpan: 12
+            group: Basic
+            order: 8
       x-walrus-ui:
         groupOrder:
         - Basic
+        - Advanced
