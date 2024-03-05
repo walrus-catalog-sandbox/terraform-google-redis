@@ -33,6 +33,33 @@ locals {
   }, var.engine_version, "REDIS_7_0")
 }
 
+# create network.
+resource "google_compute_network" "default" {
+  count = var.infrastructure.vpc_id == null ? 1 : 0
+
+  name = "default-vpc"
+}
+
+resource "google_compute_global_address" "default" {
+  count = var.infrastructure.vpc_id == null ? 1 : 0
+
+  name          = "default"
+  purpose       = "VPC_PEERING"
+  address_type  = "INTERNAL"
+  prefix_length = 16
+  network       = google_compute_network.default[0].id
+}
+
+# create private vpc connection.
+resource "google_service_networking_connection" "default" {
+  count = var.infrastructure.vpc_id == null ? 1 : 0
+
+  network                 = google_compute_network.default[0].id
+  service                 = "servicenetworking.googleapis.com"
+  reserved_peering_ranges = [google_compute_global_address.default[0].name]
+  deletion_policy         = "ABANDON"
+}
+
 #
 # Random
 #
@@ -69,7 +96,7 @@ resource "google_redis_instance" "primary" {
 
   tier = var.resources.class
 
-  authorized_network = var.infrastructure.vpc_id
+  authorized_network = var.infrastructure.vpc_id == null ? google_compute_network.default[0].id : var.infrastructure.vpc_id
 
   replica_count      = var.architecture == "replication" ? local.replication_readonly_replicas : 0
   read_replicas_mode = var.architecture == "replication" ? "READ_REPLICAS_ENABLED" : "READ_REPLICAS_DISABLED"

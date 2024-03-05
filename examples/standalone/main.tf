@@ -17,13 +17,13 @@ provider "google" {
 }
 
 // create network.
-resource "google_compute_network" "private_network" {
+resource "google_compute_network" "example" {
   name = "private-network"
 }
 
-resource "google_compute_firewall" "private_network_firewall" {
+resource "google_compute_firewall" "example" {
   name    = "private-network-firewall-policy"
-  network = google_compute_network.private_network.id
+  network = google_compute_network.example.id
   allow {
     protocol = "tcp"
     ports    = ["22"]
@@ -31,22 +31,22 @@ resource "google_compute_firewall" "private_network_firewall" {
 
   source_ranges = ["0.0.0.0/0"]
 
-  depends_on = [google_compute_network.private_network]
+  depends_on = [google_compute_network.example]
 }
 
-resource "google_compute_global_address" "private_ip_address" {
+resource "google_compute_global_address" "example" {
   name          = "private-ip-address"
   purpose       = "VPC_PEERING"
   address_type  = "INTERNAL"
   prefix_length = 16
-  network       = google_compute_network.private_network.id
+  network       = google_compute_network.example.id
 }
 
 // create private vpc connection.
-resource "google_service_networking_connection" "private_vpc_connection" {
-  network                 = google_compute_network.private_network.id
+resource "google_service_networking_connection" "example" {
+  network                 = google_compute_network.example.id
   service                 = "servicenetworking.googleapis.com"
-  reserved_peering_ranges = [google_compute_global_address.private_ip_address.name]
+  reserved_peering_ranges = [google_compute_global_address.example.name]
   deletion_policy         = "ABANDON"
 }
 
@@ -56,12 +56,12 @@ module "this" {
   source = "../.."
 
   infrastructure = {
-    vpc_id = google_compute_network.private_network.id
+    vpc_id = google_compute_network.example.id
   }
 
   architecture = "standalone"
 
-  depends_on = [google_service_networking_connection.private_vpc_connection]
+  depends_on = [google_service_networking_connection.example]
 }
 
 output "context" {

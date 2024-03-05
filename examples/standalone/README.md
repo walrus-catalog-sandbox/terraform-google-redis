@@ -3,6 +3,14 @@
 Deploy Redis service in standalone architecture by root moudle.
 
 ```bash
+# setup infrastructure
+$ terraform apply -auto-approve \
+  -target=google_compute_network.example \
+  -target=google_compute_firewall.example \
+  -target=google_compute_global_address.example \
+  -target=google_service_networking_connection.example
+
+# create service
 $ terraform apply -auto-approve
 ```
 
@@ -31,10 +39,10 @@ $ terraform apply -auto-approve
 
 | Name | Type |
 |------|------|
-| [google_compute_firewall.private_network_firewall](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_firewall) | resource |
-| [google_compute_global_address.private_ip_address](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_global_address) | resource |
-| [google_compute_network.private_network](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_network) | resource |
-| [google_service_networking_connection.private_vpc_connection](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/service_networking_connection) | resource |
+| [google_compute_firewall.example](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_firewall) | resource |
+| [google_compute_global_address.example](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_global_address) | resource |
+| [google_compute_network.example](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_network) | resource |
+| [google_service_networking_connection.example](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/service_networking_connection) | resource |
 
 ## Inputs
 

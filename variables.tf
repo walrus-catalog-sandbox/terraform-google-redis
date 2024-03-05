@@ -35,12 +35,13 @@ Specify the infrastructure information for deploying.
 Examples:
 ```
 infrastructure:
-  vpc_id: string                  # the ID of the VPC where the Redis service applies. It is a fully-qualified resource name, such as projects/{project_id}/global/networks/{network_id}.
+  vpc_id: string, optional                  # the ID of the VPC where the Redis service applies. It is a fully-qualified resource name, such as projects/{project_id}/global/networks/{network_id}.
 ```
 EOF
   type = object({
-    vpc_id = string
+    vpc_id = optional(string)
   })
+  default = {}
 }
 
 #

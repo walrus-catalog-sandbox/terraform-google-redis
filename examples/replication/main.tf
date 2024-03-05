@@ -16,52 +16,14 @@ terraform {
 provider "google" {
 }
 
-// create network.
-resource "google_compute_network" "private_network" {
-  name = "private-network"
-}
-
-resource "google_compute_firewall" "private_network_firewall" {
-  name    = "private-network-firewall-policy"
-  network = google_compute_network.private_network.id
-  allow {
-    protocol = "tcp"
-    ports    = ["22"]
-  }
-
-  source_ranges = ["0.0.0.0/0"]
-
-  depends_on = [google_compute_network.private_network]
-}
-
-resource "google_compute_global_address" "private_ip_address" {
-  name          = "private-ip-address"
-  purpose       = "VPC_PEERING"
-  address_type  = "INTERNAL"
-  prefix_length = 16
-  network       = google_compute_network.private_network.id
-}
-
-// create private vpc connection.
-resource "google_service_networking_connection" "private_vpc_connection" {
-  network                 = google_compute_network.private_network.id
-  service                 = "servicenetworking.googleapis.com"
-  reserved_peering_ranges = [google_compute_global_address.private_ip_address.name]
-  deletion_policy         = "ABANDON"
-}
-
 # create redis service.
 
 module "this" {
   source = "../.."
 
-  infrastructure = {
-    vpc_id = google_compute_network.private_network.id
-  }
-
   architecture = "replication"
 
-  depends_on = [google_service_networking_connection.private_vpc_connection]
+  replication_readonly_replicas = 3
 }
 
 output "context" {
