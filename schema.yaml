@@ -92,25 +92,24 @@ components:
               colSpan: 12
           x-walrus-ui:
             colSpan: 12
-            group: Basic
+            group: Advanced
             order: 6
         resources:
           title: Resources
           type: object
           description: |
             Specify the computing resources.
-            Select from BASIC, STANDARD_HA.Choosing the computing resource is also related to the storage resource, please view the specification document for more information.
-
-            Examples:
-            ```
-            resources:
-              class: string, optional            # https://cloud.google.com/memorystore/docs/redis/reference/rest/v1/projects.locations.instances#Tier
-            ```
+            Select from BASIC, STANDARD_HA. Choosing the computing resource is also related to the storage resource, please view the specification document for more information.
           default:
             class: STANDARD_HA
           properties:
             class:
               default: STANDARD_HA
+              description: |
+                The tier of the instance. For more information, see https://cloud.google.com/memorystore/docs/redis/reference/rest/v1/projects.locations.instances#Tier.
+              enum:
+              - BASIC
+              - STANDARD_HA
               title: Class
               type: string
               x-walrus-ui:
@@ -124,11 +123,6 @@ components:
           type: object
           description: |
             Specify the Redis memory storage size in gigabytes.
-            Examples:
-            ```
-            storage:
-              size: number, optional         # in gigabytes
-            ```
           default:
             size: 5
           properties:

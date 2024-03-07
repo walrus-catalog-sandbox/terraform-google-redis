@@ -104,4 +104,6 @@ resource "google_redis_instance" "primary" {
   customer_managed_key = try(var.infrastructure.kms_key_id, null)
 
   redis_configs = local.configs
+
+  depends_on = [google_service_networking_connection.default]
 }
