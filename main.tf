@@ -6,10 +6,8 @@ locals {
   resource_name    = coalesce(try(var.context["resource"]["name"], null), "example")
   resource_id      = coalesce(try(var.context["resource"]["id"], null), "example_id")
 
-  namespace = join("-", [local.project_name, local.environment_name])
-
   tags = {
-    "Name" = join("-", [local.namespace, local.resource_name])
+    "Name" = local.resource_name
 
     "walrus.seal.io-catalog-name"     = "terraform-google-redis"
     "walrus.seal.io-project-id"       = local.project_id
@@ -79,8 +77,7 @@ resource "random_string" "name_suffix" {
 # create server.
 
 locals {
-  name     = join("-", [local.resource_name, random_string.name_suffix.result])
-  fullname = join("-", [local.namespace, local.name])
+  name = join("-", [local.resource_name, random_string.name_suffix.result])
 
   replication_readonly_replicas = var.replication_readonly_replicas == 0 ? 1 : var.replication_readonly_replicas
 
@@ -88,9 +85,19 @@ locals {
 }
 
 resource "google_redis_instance" "primary" {
-  name          = local.fullname
+  name          = local.name
   redis_version = local.version
   auth_enabled  = true
+
+  labels = {
+    "walrus-seal-io-catalog-name"     = "terraform-google-redis"
+    "walrus-seal-io-project-id"       = local.project_id
+    "walrus-seal-io-environment-id"   = local.environment_id
+    "walrus-seal-io-resource-id"      = local.resource_id
+    "walrus-seal-io-project-name"     = local.project_name
+    "walrus-seal-io-environment-name" = local.environment_name
+    "walrus-seal-io-resource-name"    = local.resource_name
+  }
 
   memory_size_gb = var.storage.size
 
