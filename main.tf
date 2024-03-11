@@ -35,13 +35,13 @@ locals {
 resource "google_compute_network" "default" {
   count = var.infrastructure.vpc_id == null ? 1 : 0
 
-  name = "default-vpc"
+  name = local.name
 }
 
 resource "google_compute_global_address" "default" {
   count = var.infrastructure.vpc_id == null ? 1 : 0
 
-  name          = "default"
+  name          = local.name
   purpose       = "VPC_PEERING"
   address_type  = "INTERNAL"
   prefix_length = 16
@@ -65,7 +65,7 @@ resource "google_service_networking_connection" "default" {
 # create the name with a random suffix.
 
 resource "random_string" "name_suffix" {
-  length  = 10
+  length  = 9
   special = false
   upper   = false
 }
