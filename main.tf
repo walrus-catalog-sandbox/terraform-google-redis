@@ -6,6 +6,8 @@ locals {
   resource_name    = coalesce(try(var.context["resource"]["name"], null), "example")
   resource_id      = coalesce(try(var.context["resource"]["id"], null), "example_id")
 
+  namespace = join("-", [local.project_name, local.environment_name])
+
   tags = {
     "Name" = local.resource_name
 
@@ -35,13 +37,13 @@ locals {
 resource "google_compute_network" "default" {
   count = var.infrastructure.vpc_id == null ? 1 : 0
 
-  name = local.name
+  name = local.fullname
 }
 
 resource "google_compute_global_address" "default" {
   count = var.infrastructure.vpc_id == null ? 1 : 0
 
-  name          = local.name
+  name          = local.fullname
   purpose       = "VPC_PEERING"
   address_type  = "INTERNAL"
   prefix_length = 16
@@ -77,7 +79,8 @@ resource "random_string" "name_suffix" {
 # create server.
 
 locals {
-  name = join("-", [local.resource_name, random_string.name_suffix.result])
+  name     = join("-", [local.resource_name, random_string.name_suffix.result])
+  fullname = format("walrus-%s", md5(join("-", [local.namespace, local.name])))
 
   replication_readonly_replicas = var.replication_readonly_replicas == 0 ? 1 : var.replication_readonly_replicas
 
@@ -85,7 +88,7 @@ locals {
 }
 
 resource "google_redis_instance" "primary" {
-  name          = local.name
+  name          = local.fullname
   redis_version = local.version
   auth_enabled  = true
 
